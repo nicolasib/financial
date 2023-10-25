@@ -1,8 +1,9 @@
 import express from 'express'
 import cors from 'cors'
-import fetch from 'node-fetch'
+import firebase from './firebase'
 
 const app = express();
+const db = firebase.firestore();
 const corsOptions = {
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -17,22 +18,20 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.post('/proxy', async (req, res) => {
-  const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/16864345/38rmo67/';
-
   try {
-    const response = await fetch(zapierWebhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(req.body)
+    const payload = req.body;
+    const docRef = db.collection('transactions').doc(); // Cria um novo documento
+
+    await docRef.set({
+      payload,
+      createdAt: admin.firestore.FieldValue.serverTimestamp() // timestamp do servidor
     });
 
     const data = await response.json();
     res.json(data);
 
   } catch (error) {
-    console.error('Erro ao enviar para o Zapier:', error);
+    console.error('Erro ao salvar no Firestore:', error);
     res.status(500).json({ error: 'Algo deu errado' });
   }
 });
