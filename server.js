@@ -25,12 +25,10 @@ app.use(express.json());
 // Rota para manipular o payload e salvar no Firebase
 app.post('/proxy', async (req, res) => {
   const payload = req.body;
-  const docRef = db.collection('transactions').doc(); // Cria um novo documento
-
-  await docRef.set({
+  await db.collection('transactions').add({
     payload,
-    createdAt: admin.firestore.FieldValue.serverTimestamp() // timestamp do servidor
-  });
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  })
 
   res.json({ success: true });
 });
