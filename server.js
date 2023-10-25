@@ -1,42 +1,41 @@
-import express from 'express'
-import cors from 'cors'
-import fetch from 'node-fetch'
-import firebase from './firebase'
+const express = require('express');
+const cors = require('cors');
+const admin = require('firebase-admin');
 
-const app = express();
-const db = firebase.firestore();
-const corsOptions = {
-  origin: '*',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204,
+// Inicializar o Firebase
+const firebaseConfig = {
+  apiKey: "process.env.AIzaSyCVPdDwvn2GnugJw2Fm3k_idn4mXQlsn1Y",
+  authDomain: "financial-n.firebaseapp.com",
+  projectId: "financial-n",
+  storageBucket: "financial-n.appspot.com",
+  messagingSenderId: "869482768612",
+  appId: "1:869482768612:web:b1e9101a527b4fe5f664f1"
 };
 
-// Permitir CORS para todas as origens
-app.use(cors(corsOptions));
+admin.initializeApp(firebaseConfig);
 
-// Middleware para analisar o corpo JSON das requisições
+const db = admin.firestore();
+
+const app = express();
+
+// Middleware
+app.use(cors());
 app.use(express.json());
 
+// Rota para manipular o payload e salvar no Firebase
 app.post('/proxy', async (req, res) => {
-  try {
-    const payload = req.body;
-    const docRef = db.collection('transactions').doc(); // Cria um novo documento
+  const payload = req.body;
+  const docRef = db.collection('transactions').doc(); // Cria um novo documento
 
-    await docRef.set({
-      payload,
-      createdAt: admin.firestore.FieldValue.serverTimestamp() // timestamp do servidor
-    });
+  await docRef.set({
+    payload,
+    createdAt: admin.firestore.FieldValue.serverTimestamp() // timestamp do servidor
+  });
 
-    const data = await response.json();
-    res.json(data);
-
-  } catch (error) {
-    console.error('Erro ao salvar no Firestore:', error);
-    res.status(500).json({ error: 'Algo deu errado' });
-  }
+  res.json({ success: true });
 });
 
+// Ouvir na porta
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
