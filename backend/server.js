@@ -3,9 +3,15 @@ import cors from 'cors'
 import fetch from 'node-fetch'
 
 const app = express();
+const corsOptions = {
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
 
 // Permitir CORS para todas as origens
-app.use(cors());
+app.use(cors(corsOptions));
 
 // Middleware para analisar o corpo JSON das requisições
 app.use(express.json());
@@ -31,7 +37,7 @@ app.post('/proxy', async (req, res) => {
   }
 });
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
