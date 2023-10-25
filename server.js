@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import firebase from './firebase'
+import {firebase} from './firebase'
 
 const app = express();
 const db = firebase.firestore();
